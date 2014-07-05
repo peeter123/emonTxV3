@@ -1,6 +1,6 @@
 //      Code by Robin Emley (calypso_rae on Open Energy Monitor Forum) - September 2013
 //      Updated November 2013 to include analog and LED pins for the emonTx V3 by Glyn Hudson
-//      Updated July 2014 to include voltage measurements
+//      Updated July 2014 to include voltage measurements by Peter Oostewechel
 //
 //      Upgrades by RAE, June 2014.  
 //      - The RF transmission interval can now be changed, it was previously fixed at once per second.
@@ -22,6 +22,8 @@
 #define LED_ON 1
 #define LED_OFF 0
 
+// Define the speed for serial communication, default for emonTxV3 is 9600
+#define SERIAL_SPEED 38400
 
 // In this sketch, the ADC is free-running with a cycle time of ~104uS.
 
@@ -182,14 +184,14 @@ void setup()
   rf12_initialize(nodeID, RF_freq, networkGroup);             // initialize RF
   //rf12_sleep(RF12_SLEEP); <- now active continuously 
   
-  Serial.begin(38400);                                        // initialize Serial interface
+  Serial.begin(SERIAL_SPEED);                                 // initialize Serial interface
   Serial.println();
   Serial.println();
   Serial.println();
   Serial.println("----------------------------------");
   Serial.println("Sketch ID:      emonTxV3_4chan.ino");
        
-  pinMode(LedPin, OUTPUT);                                              // Setup indicator LED
+  pinMode(LedPin, OUTPUT);                                    // Setup indicator LED
        
   // When using integer maths, calibration values that have supplied in floating point 
   // form need to be rescaled.  
