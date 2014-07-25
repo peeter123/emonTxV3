@@ -7,7 +7,7 @@ import logging
 class Emoncms(object):
     def __init__(self, config):
         # Logging
-        self.log = logging.getLogger(__name__)
+        self.log = logging.getLogger('root')
 
         # Api key for EmonCMS
         self.apiKey = config['Emoncms']['apikey']

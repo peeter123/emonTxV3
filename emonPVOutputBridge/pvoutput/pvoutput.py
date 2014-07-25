@@ -6,7 +6,7 @@ import logging
 class PVOutput(object):
     def __init__(self, config):
         # Logging
-        self.log = logging.getLogger(__name__)
+        self.log = logging.getLogger('root')
 
         # Api key and system id
         self.apiKey = config['PVOutput']['apikey']
@@ -19,8 +19,6 @@ class PVOutput(object):
         t = time.strftime('%H:%M', current_time)
         power_generation = generation / (int(self.interval)/60)
         power_consumption = consumption / (int(self.interval)/60)
-        self.log.debug("Power generation: " + '%.2f' % power_generation + " W")
-        self.log.debug("Power consumption: " + '%.2f' % power_consumption + " W")
 
         url = "/service/r2/addstatus.jsp?key=%s&sid=%s&d=%s&t=%s&v2=%i&v4=%i&v6=%i" % \
               (self.apiKey, self.sysId, d, t, int(round(power_generation)), int(round(power_consumption)), int(voltage))

@@ -7,7 +7,7 @@ import logging
 from distutils.util import strtobool
 
 # Logging
-log = logging.getLogger(__name__)
+log = logging.getLogger('root')
 
 
 def writeCSV(consumption, generation, voltage, config):

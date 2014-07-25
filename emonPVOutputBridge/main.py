@@ -9,11 +9,9 @@ import configparser
 import traceback
 import emoncms.emoncms as emoncms
 import pvoutput.pvoutput as pvoutput
+import core.log as log
+from distutils.util import strtobool
 from apscheduler.scheduler import Scheduler
-
-logging.basicConfig(format='%(asctime)s %(name)s - %(levelname)s: %(message)s', level=logging.DEBUG)
-
-debug = True
 
 
 class Loader(object):
@@ -23,7 +21,7 @@ class Loader(object):
         self.scheduler = Scheduler()
 
         # Logging
-        self.log = logging.getLogger(__name__)
+        self.log = log.setupCustomLogger('root')
 
         # Get options via arg
         self.options = sys.argv[1:]
@@ -37,6 +35,10 @@ class Loader(object):
             sys.exit(1)
         self.config = configAsDict(cp)
 
+        # Set log level according to debug config parameter
+        if not strtobool(self.config['System']['debug']):
+            logging.getLogger('root').setLevel(logging.INFO)
+
         # Store previous values to calculate energy values
         self.prev_consumption = 0
         self.prev_generation = 0
@@ -46,7 +48,7 @@ class Loader(object):
         signal.signal(signal.SIGTERM, lambda signum, stack_frame: sys.exit(1))
 
     def onExitSignal(self, signal, frame):
-        self.log.info('Exit received with signal ' + str(signal) + ', cleanup')
+        self.log.warning('Exit received with signal ' + str(signal) + ', cleanup')
         self.scheduler.shutdown()
         sys.exit(signal)
 
@@ -107,4 +109,3 @@ if __name__ == '__main__':
                 print(traceback.format_exc())
         except:
             print(traceback.format_exc())
-        raise
