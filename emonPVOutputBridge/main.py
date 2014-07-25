@@ -48,7 +48,8 @@ class Loader(object):
         signal.signal(signal.SIGTERM, lambda signum, stack_frame: sys.exit(1))
 
     def onExitSignal(self, signal, frame):
-        self.log.warning('Exit received with signal ' + str(signal) + ', cleanup')
+        from core.helpers import signalToName
+        self.log.warning('Exit received with signal ' + signalToName(signal) + ', cleanup')
         self.scheduler.shutdown()
         sys.exit(signal)
 

@@ -1,5 +1,11 @@
 import configparser
 import struct
+import signal
+
+
+def signalToName(signal_number) -> str:
+    SIGNALS_TO_NAMES_DICT = dict((getattr(signal, n), n) for n in dir(signal) if n.startswith('SIG') and '_' not in n )
+    return SIGNALS_TO_NAMES_DICT.get(signal_number, "UNNAMED: %d" % signal_number)
 
 
 def configAsDict(config: configparser.ConfigParser) -> dict:
