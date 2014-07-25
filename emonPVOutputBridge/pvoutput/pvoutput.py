@@ -23,7 +23,7 @@ class PVOutput(object):
         self.log.debug("Power consumption: " + '%.2f' % power_consumption + " W")
 
         url = "/service/r2/addstatus.jsp?key=%s&sid=%s&d=%s&t=%s&v2=%i&v4=%i&v6=%i" % \
-              (self.apiKey, self.sysId, d, t, int(power_generation), int(power_consumption), int(voltage))
+              (self.apiKey, self.sysId, d, t, int(round(power_generation)), int(round(power_consumption)), int(voltage))
 
         try:
             self.log.debug("Connecting to pvoutput.org" + url)
