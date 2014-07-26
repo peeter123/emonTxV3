@@ -23,7 +23,7 @@ def configAsDict(config: configparser.ConfigParser) -> dict:
 
 
 def bytesToInt(b1, b2):
-    return struct.unpack( "h", bytes([int(b1), int(b2)]))[0]
+    return struct.unpack("h", bytes([int(b1), int(b2)]))[0]
 
 
 def getGitRevisionShortHash() -> bytes:
@@ -31,6 +31,6 @@ def getGitRevisionShortHash() -> bytes:
     versionHash = None
     try:
         versionHash = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD'])
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except:
         versionHash = 'Unknown\n'.encode()
     return versionHash
