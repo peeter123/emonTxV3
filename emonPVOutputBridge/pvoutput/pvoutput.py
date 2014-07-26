@@ -13,6 +13,9 @@ class PVOutput(object):
         self.sysId = config['PVOutput']['sysid']
         self.interval = config['PVOutput']['interval']
 
+        # Should we actually upload to PVOutput
+        self.upload = config['PVOutput']['upload']
+
     def postPower(self, consumption, generation, voltage):
         current_time = time.strptime(time.ctime(time.time()))
         d = time.strftime('%Y%m%d', current_time)
@@ -24,14 +27,18 @@ class PVOutput(object):
               (self.apiKey, self.sysId, d, t, int(round(power_generation)), int(round(power_consumption)), int(voltage))
 
         try:
-            self.log.debug("Connecting to pvoutput.org" + url)
-            #connection = http.client.HTTPConnection("pvoutput.org")
-            #connection.request("GET", url)
-            #response = connection.getresponse()
             self.log.info("Adding to PVOutput: %s - %s" % (d, t))
             self.log.info("                    %.2f Wh generated (%.2f W)" % (generation, power_generation))
             self.log.info("                    %.2f Wh consumed (%.2f W)" % (consumption, power_consumption))
             self.log.info("                    %i V" % voltage)
-            #self.log.info("PVOutput response: " + response.read().decode("utf-8"))
+
+            if self.upload:
+                self.log.debug("Connecting to pvoutput.org" + url)
+                connection = http.client.HTTPConnection("pvoutput.org")
+                connection.request("GET", url)
+                response = connection.getresponse()
+                self.log.info("PVOutput response: " + response.read().decode("utf-8"))
+            else:
+                self.log.info("Test mode, no acutual data uploaded to PVOutput.")
         except http.client.HTTPException:
             self.log.error("Unexpected error when connecting to PVOutput")

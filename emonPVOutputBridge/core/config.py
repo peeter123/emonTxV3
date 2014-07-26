@@ -21,6 +21,7 @@ voltagefeedid = integer()
 apikey = string()
 sysid = integer()
 interval = integer(min=1, max=59, default=5)
+upload = boolean(default=True)
 """
 
 log = logging.getLogger('root')
