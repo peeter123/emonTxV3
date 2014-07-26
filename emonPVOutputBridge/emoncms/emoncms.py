@@ -1,7 +1,6 @@
-import time
-import json
 import http.client
 import logging
+import socket
 
 
 class Emoncms(object):
@@ -9,7 +8,7 @@ class Emoncms(object):
         # Logging
         self.log = logging.getLogger('root')
 
-        # Api key for EmonCMS
+        # Settings for EmonCMS
         self.apiKey = config['Emoncms']['apikey']
         self.host = config['Emoncms']['host']
         self.basePath = config['Emoncms']['path']
@@ -18,37 +17,47 @@ class Emoncms(object):
         self.voltageFeedID = config['Emoncms']['voltagefeedid']
 
     def getConsumptionEnergy(self):
-        try:
-            connection = http.client.HTTPConnection(self.host, timeout=5)
-            url = self.basePath + '/feed/value.json?id=' + self.consumptionFeedID + '&apikey=' + self.apiKey
-            connection.request("GET", url)
-            # Get the response and strip quote
-            consumption = float(connection.getresponse().read().decode("utf-8")[1:-1]) * 1000
-            self.log.debug("Consumption: " + '%.2f' % consumption + " Wh")
+        value = self.connectAndRetreive(self.consumptionFeedID)
+        if type(value) == float:
+            consumption = value * 1000
+            self.log.debug('Consumption:  %.2f Wh' % consumption)
             return consumption
-        except http.client.HTTPException:
-            self.log.error("Unexpected HTTP error when connecting to EmonCMS")
+        else:
+            return value
 
     def getGenerationEnergy(self):
-        try:
-            connection = http.client.HTTPConnection(self.host, timeout=5)
-            url = self.basePath + '/feed/value.json?id=' + self.generationFeedID + '&apikey=' + self.apiKey
-            connection.request("GET", url)
-            # Get the response and strip quote
-            generation = float(connection.getresponse().read().decode("utf-8")[1:-1]) * 1000
-            self.log.debug("Generation: " + '%.2f' % generation + " Wh")
+        value = self.connectAndRetreive(self.generationFeedID)
+        if type(value) == float:
+            generation = value * 1000
+            self.log.debug('Generation: %.2f Wh' % generation)
             return generation
-        except http.client.HTTPException:
-            self.log.error("Unexpected HTTP error when connecting to EmonCMS")
+        else:
+            return value
 
     def getVoltage(self):
+        value = self.connectAndRetreive(self.voltageFeedID)
+        if type(value) == float:
+            voltage = int(value)
+            self.log.debug("Voltage: %i V" % voltage)
+            return voltage
+        else:
+            return value
+
+    def connectAndRetreive(self, feed) -> float:
+        """
+        Connect to emoncms with the host defined in config file.
+        If a feed cannot be found or connection is impossible, zero is returned as value
+        """
         try:
+            url = self.basePath + '/feed/value.json?id=%i&apikey=%s' % (feed, self.apiKey)
             connection = http.client.HTTPConnection(self.host, timeout=5)
-            url = self.basePath + '/feed/value.json?id=' + self.voltageFeedID + '&apikey=' + self.apiKey
             connection.request("GET", url)
             # Get the response and strip quote
-            voltage = connection.getresponse().read().decode("utf-8")[1:-1]
-            self.log.debug("Voltage: " + voltage + " V")
-            return voltage
-        except http.client.HTTPException:
-            self.log.error("Unexpected HTTP error when connecting to EmonCMS")
+            value = float(connection.getresponse().read().decode("utf-8")[1:-1])
+        except (http.client.HTTPException, socket.error, socket.gaierror):
+            self.log.error("Unexpected error when connecting to EmonCMS")
+            value = False
+        except ValueError as e:
+            self.log.error("Cannot retreive feed data, returning 0.0. Error -> " + e.args[0])
+            value = False
+        return value

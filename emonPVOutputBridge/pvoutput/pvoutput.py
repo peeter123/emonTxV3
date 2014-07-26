@@ -25,13 +25,13 @@ class PVOutput(object):
 
         try:
             self.log.debug("Connecting to pvoutput.org" + url)
-            connection = http.client.HTTPConnection("pvoutput.org")
-            connection.request("GET", url)
-            response = connection.getresponse()
+            #connection = http.client.HTTPConnection("pvoutput.org")
+            #connection.request("GET", url)
+            #response = connection.getresponse()
             self.log.info("Adding to PVOutput: %s - %s" % (d, t))
             self.log.info("                    %.2f Wh generated (%.2f W)" % (generation, power_generation))
             self.log.info("                    %.2f Wh consumed (%.2f W)" % (consumption, power_consumption))
             self.log.info("                    %i V" % voltage)
-            self.log.info("PVOutput response: " + response.read().decode("utf-8"))
+            #self.log.info("PVOutput response: " + response.read().decode("utf-8"))
         except http.client.HTTPException:
             self.log.error("Unexpected error when connecting to PVOutput")

@@ -4,14 +4,13 @@ import os
 import csv
 import sys
 import logging
-from distutils.util import strtobool
 
 # Logging
 log = logging.getLogger('root')
 
 
 def writeCSV(consumption, generation, voltage, config):
-    if strtobool(config['System']['storecsv']):
+    if config['System']['storecsv']:
         d = time.strftime('%Y%m%d')
         t = time.strftime('%H:%M')
         path = config['System']['csvpath']
@@ -19,7 +18,7 @@ def writeCSV(consumption, generation, voltage, config):
 
         if not os.path.exists(path):
             try:
-                os.mkdir(path)
+                os.makedirs(path, exist_ok=True)
             except OSError:
                 log.critical('Cannot create csv directory')
                 sys.exit(1)
