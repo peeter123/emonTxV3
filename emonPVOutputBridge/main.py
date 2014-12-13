@@ -77,7 +77,7 @@ class emonPVOutputBridge(object):
         gen = ecms.getGenerationEnergy()
         vol = ecms.getVoltage()
 
-        if con and gen and vol and self.inital_read:
+        if not isinstance(con, bool) and not isinstance(gen, bool) and not isinstance(vol, bool) and self.inital_read:
             # Post data to PVOutput and write CSV
             pvo.postPower(con - self.prev_consumption, gen - self.prev_generation, vol)
             writeCSV(con - self.prev_consumption, gen - self.prev_generation, vol, self.config)
@@ -86,7 +86,7 @@ class emonPVOutputBridge(object):
             self.prev_consumption = con
             self.prev_generation = gen
         elif not self.inital_read:
-            self.log.warning("Initial values not read, do that first before posting tom PVOutput.")
+            self.log.warning("Initial values not read, do that first before posting to PVOutput.")
             self.setInitialValues()
         else:
             self.log.warning("No data received from emoncms, not posting to PVOutput. "
@@ -100,7 +100,7 @@ class emonPVOutputBridge(object):
         con = ecms.getConsumptionEnergy()
         gen = ecms.getGenerationEnergy()
 
-        if con and gen:
+        if not isinstance(con, bool) and not isinstance(gen, bool):
             self.inital_read = True
             self.prev_consumption = con
             self.prev_generation = gen
