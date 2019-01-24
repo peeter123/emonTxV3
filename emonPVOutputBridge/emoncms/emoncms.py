@@ -57,7 +57,7 @@ class Emoncms(object):
                 connection = http.client.HTTPConnection(self.host, timeout=5)
             connection.request("GET", url)
             # Get the response and strip quote
-            data = connection.getresponse().read().decode("utf-8")[1:-1]
+            data = connection.getresponse().read().decode("utf-8")
             self.log.debug("Data received: %s" % data)
             value = float(data);
         except (http.client.HTTPException, socket.error, socket.gaierror):
