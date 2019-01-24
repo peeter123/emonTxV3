@@ -11,6 +11,7 @@ class Emoncms(object):
         # Settings for EmonCMS
         self.apiKey = config['Emoncms']['apikey']
         self.host = config['Emoncms']['host']
+        self.ssl = config['Emoncms']['ssl']
         self.basePath = config['Emoncms']['path']
         self.consumptionFeedID = config['Emoncms']['consumptionfeedid']
         self.generationFeedID = config['Emoncms']['generationfeedid']
@@ -50,7 +51,10 @@ class Emoncms(object):
         """
         try:
             url = self.basePath + '/feed/value.json?id=%i&apikey=%s' % (feed, self.apiKey)
-            connection = http.client.HTTPConnection(self.host, timeout=5)
+            if self.ssl:
+                connection = http.client.HTTPSConnection(self.host, timeout=5)
+            else:
+                connection = http.client.HTTPConnection(self.host, timeout=5)
             connection.request("GET", url)
             # Get the response and strip quote
             data = connection.getresponse().read().decode("utf-8")[1:-1]
